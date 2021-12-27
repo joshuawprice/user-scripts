@@ -4,7 +4,7 @@ import argparse
 import requests
 import sys
 import subprocess
-import os
+# import os
 
 
 # Code from before using intermixed parsing.
@@ -15,7 +15,8 @@ import os
 #         # Remove duplicates
 #         for i in range(0, len(values)):
 #             for j in range(i + 1, len(values)):
-#                 if (os.path.abspath(values[i].name) == os.path.abspath(values[j].name)):
+#                 if (os.path.abspath(values[i].name) ==
+#  os.path.abspath(values[j].name)):
 #                     values.pop(j)
 
 #         # Append extra files found
@@ -31,7 +32,8 @@ import os
 #             if os.path.isfile(value):
 #                 if getattr(namespace, "files") != None:
 #                     print(
-#                         f"Local file given to {option_string} flag. Dazed and confused, but trying to continue", file=sys.stderr)
+#                         f"Local file given to {option_string} flag. Dazed
+#  and confused, but trying to continue", file=sys.stderr)
 #                 else:
 #                     extra_files.append(open(value, 'rb'))
 #                     value = self.const
