@@ -118,6 +118,10 @@ def main():
         "--catgirls", nargs='?',
         const="",
         help="upload to catgirlsare.sexy")
+    # destinations_group.add_argument(
+    #     "-c", "--clipboard", action="store_true",
+    #     help="only allowed if this is the only destination;"
+    #          "saves file to clipboard")
 
     # Finally, allow files to be uploaded, including - (stdin)
     # TODO: Maybe remove dupes? see files action class for how.
@@ -132,6 +136,7 @@ def main():
     print(args, file=sys.stderr)
 
     # Quit if no destinations are given
+    # TODO: If catgirls is empty then give better error message.
     if not at_least_one_dest(args):
         parser.error("at least one destination is required")
 
