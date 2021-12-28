@@ -59,6 +59,13 @@ class TheNullPointer(Uploader):
         print(r.text.strip())
 
 
+class X0(Uploader):
+    def upload(self, file: BinaryIO) -> None:
+        r = requests.post("https://x0.at", files={"file": file})
+        r.raise_for_status()
+        print(r.text.strip())
+
+
 def the_null_pointer_upload(files: list[BinaryIO]) -> None:
     for file in files:
         r = requests.post("https://0x0.st", files={"file": file})
