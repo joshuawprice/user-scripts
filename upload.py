@@ -7,6 +7,7 @@ from typing import BinaryIO
 import requests
 import sys
 import subprocess
+import urllib.request
 
 
 # Code from before using intermixed parsing.
@@ -77,6 +78,37 @@ class Catgirls(Uploader):
             files={"file": file})
         r.raise_for_status()
         print(r.json()["url"])
+
+
+class Asgard(Uploader):
+    def __init__(self, location: str) -> None:
+        self.location = location
+
+        # TODO: Look up ssh agents to check if SSH_ASKPASS is really required.
+        if (not os.getenv("SSH_ASKPASS")
+            and bool(subprocess.run([
+                "ssh-add", "-qL"],
+                stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+                .returncode)):
+            print("SSH_ASKPASS is not set, upload to asgard may fail.",
+                  file=sys.stderr)
+
+    def upload(self, file: BinaryIO) -> None:
+        for i in range(3):
+            if not bool(
+                    subprocess.run([
+                        "scp",
+                        "-qo",
+                        "ServerAliveInterval 3",
+                        file.name,
+                        f"asgard.joshwprice.com:/opt/media/{self.location}/"])
+                    .returncode):
+                break
+        else:
+            print("Upload to asgard failed 3 times.")
+            sys.exit(1)
+        print("https://files.kruitana.com/"
+              + urllib.request.pathname2url(file.name))
 
 
 def the_null_pointer_upload(files: list[BinaryIO]) -> None:
