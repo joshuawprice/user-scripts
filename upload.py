@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from abc import ABC, abstractmethod
 import argparse
 import os
 from typing import BinaryIO
@@ -43,6 +44,12 @@ import subprocess
 
 #         setattr(namespace, self.dest, value)
 ################################################################
+
+
+class Uploader(ABC):
+    @abstractmethod
+    def upload(self, file: BinaryIO) -> None:
+        raise NotImplementedError
 
 
 def the_null_pointer_upload(files: list[BinaryIO]) -> None:
