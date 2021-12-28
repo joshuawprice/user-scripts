@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+from typing import BinaryIO
 import requests
 import sys
 import subprocess
@@ -44,21 +45,21 @@ import subprocess
 ################################################################
 
 
-def the_null_pointer_upload(files):
+def the_null_pointer_upload(files: list[BinaryIO]) -> None:
     for file in files:
         r = requests.post("https://0x0.st", files={"file": file})
         r.raise_for_status()
         print(r.text.strip())
 
 
-def x0_upload(files):
+def x0_upload(files: list[BinaryIO]) -> None:
     for file in files:
         r = requests.post("https://x0.at", files={"file": file})
         r.raise_for_status()
         print(r.text.strip())
 
 
-def catgirls_upload(files, api_key):
+def catgirls_upload(files: list[BinaryIO], api_key: str) -> None:
     for file in files:
         r = requests.post(
             "https://catgirlsare.sexy/api/upload",
@@ -68,7 +69,7 @@ def catgirls_upload(files, api_key):
         print(r.json()["url"])
 
 
-def asgard_upload(files, location):
+def asgard_upload(files: list[BinaryIO], location: str):
     # TODO: Add warning if SSH_ASKPASS env var isn't set.
 
     for file in files:
@@ -86,7 +87,7 @@ def asgard_upload(files, location):
             sys.exit(1)
 
 
-def at_least_one_dest(args):
+def at_least_one_dest(args: type[argparse.Namespace]) -> bool:
     for destination in destinations:
         if getattr(args, destination):
             return True
