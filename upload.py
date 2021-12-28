@@ -155,6 +155,9 @@ def main():
     print(args.files, file=sys.stderr)
     print(args, file=sys.stderr)
 
+    # TODO: Add clipboard uploader
+    destinations = []
+
     if getattr(args, "0x0"):
         destinations.append(TheNullPointer())
 
@@ -179,8 +182,6 @@ def main():
 
 
 if __name__ == "__main__":
-    # TODO: Add clipboard uploader
-    destinations = []
     main()
 
 # vim: shiftwidth=4 expandtab autoindent
