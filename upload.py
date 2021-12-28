@@ -50,6 +50,7 @@ def the_null_pointer_upload(files: list[BinaryIO]) -> None:
         r = requests.post("https://0x0.st", files={"file": file})
         r.raise_for_status()
         print(r.text.strip())
+        file.seek(0)
 
 
 def x0_upload(files: list[BinaryIO]) -> None:
@@ -57,6 +58,7 @@ def x0_upload(files: list[BinaryIO]) -> None:
         r = requests.post("https://x0.at", files={"file": file})
         r.raise_for_status()
         print(r.text.strip())
+        file.seek(0)
 
 
 def catgirls_upload(files: list[BinaryIO], api_key: str) -> None:
@@ -67,6 +69,7 @@ def catgirls_upload(files: list[BinaryIO], api_key: str) -> None:
             files={"file": file})
         r.raise_for_status()
         print(r.json()["url"])
+        file.seek(0)
 
 
 def asgard_upload(files: list[BinaryIO], location: str):
@@ -90,6 +93,7 @@ def asgard_upload(files: list[BinaryIO], location: str):
         else:
             print("Upload to asgard failed 3 times.")
             sys.exit(1)
+        file.seek(0)
 
 
 def at_least_one_dest(args: type[argparse.Namespace]) -> bool:
