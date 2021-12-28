@@ -66,6 +66,19 @@ class X0(Uploader):
         print(r.text.strip())
 
 
+class Catgirls(Uploader):
+    def __init__(self, api_key: str) -> None:
+        self.api_key = api_key
+
+    def upload(self, file: BinaryIO) -> None:
+        r = requests.post(
+            "https://catgirlsare.sexy/api/upload",
+            data={"key": self.api_key},
+            files={"file": file})
+        r.raise_for_status()
+        print(r.json()["url"])
+
+
 def the_null_pointer_upload(files: list[BinaryIO]) -> None:
     for file in files:
         r = requests.post("https://0x0.st", files={"file": file})
