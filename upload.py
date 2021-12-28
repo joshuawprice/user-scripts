@@ -213,29 +213,32 @@ def main():
     print(args.files, file=sys.stderr)
     print(args, file=sys.stderr)
 
-    # Quit if no destinations are given
-    # TODO: If catgirls is empty then give better error message.
-    if not at_least_one_dest(args):
-        parser.error("at least one destination is required")
-
     if getattr(args, "0x0"):
-        the_null_pointer_upload(args.files)
+        destinations.append(TheNullPointer())
 
     if args.x0:
-        x0_upload(args.files)
+        destinations.append(X0())
 
     if args.catgirls:
-        catgirls_upload(args.files, args.catgirls)
+        destinations.append(Catgirls(args.catgirls))
 
     if args.asgard:
-        asgard_upload(args.files, args.asgard)
+        destinations.append(Asgard(args.asgard))
 
-    # Reminder: Make uploader classes!
+    # Quit if no destinations are given
+    # TODO: If catgirls is empty then give better error message.
+    if not destinations:
+        parser.error("at least one destination is required")
+
+    for destination in destinations:
+        for file in args.files:
+            destination.upload(file)
+            file.seek(0)
 
 
 if __name__ == "__main__":
     # TODO: Add clipboard uploader
-    destinations = ["0x0", "x0", "asgard", "catgirls"]
+    destinations = []
     main()
 
 # vim: shiftwidth=4 expandtab autoindent
