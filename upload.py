@@ -113,8 +113,9 @@ def main():
         "--0x0", action="store_true", help="upload to 0x0.st")
     destinations_group.add_argument(
         "--x0", action="store_true", help="upload to x0.at")
-    destinations_group.add_argument("--asgard", nargs='?',
-                                    const=".misc",  help="upload to asgard")
+    destinations_group.add_argument(
+        "--asgard", nargs='?',
+        const=".misc",  help="upload to asgard")
     destinations_group.add_argument(
         "--catgirls", nargs='?',
         const="",
@@ -126,8 +127,9 @@ def main():
 
     # Finally, allow files to be uploaded, including - (stdin)
     # TODO: Maybe remove dupes? see files action class for how.
-    parser.add_argument("files", type=argparse.FileType(
-        'rb'), metavar="FILE", nargs="+", help="file to be uploaded")
+    parser.add_argument(
+        "files", type=argparse.FileType('rb'),
+        metavar="FILE", nargs="+", help="file to be uploaded")
 
     # Save parsed arguments to args object
     args = parser.parse_intermixed_args()
