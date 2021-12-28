@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
 import argparse
+import os
 from typing import BinaryIO
 import requests
 import sys
 import subprocess
-# import os
 
 
 # Code from before using intermixed parsing.
@@ -70,7 +70,12 @@ def catgirls_upload(files: list[BinaryIO], api_key: str) -> None:
 
 
 def asgard_upload(files: list[BinaryIO], location: str):
-    # TODO: Add warning if SSH_ASKPASS env var isn't set.
+    if (not os.environ["SSH_ASKPASS"]
+            and bool(subprocess.run([
+                "ssh-add", "-qL"],
+                stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+                    .returncode)):
+        print("SSH_ASKPASS is not set, upload may fail.", file=sys.stderr)
 
     for file in files:
         for i in range(3):
