@@ -111,64 +111,6 @@ class Asgard(Uploader):
               + urllib.request.pathname2url(file.name))
 
 
-def the_null_pointer_upload(files: list[BinaryIO]) -> None:
-    for file in files:
-        r = requests.post("https://0x0.st", files={"file": file})
-        r.raise_for_status()
-        print(r.text.strip())
-        file.seek(0)
-
-
-def x0_upload(files: list[BinaryIO]) -> None:
-    for file in files:
-        r = requests.post("https://x0.at", files={"file": file})
-        r.raise_for_status()
-        print(r.text.strip())
-        file.seek(0)
-
-
-def catgirls_upload(files: list[BinaryIO], api_key: str) -> None:
-    for file in files:
-        r = requests.post(
-            "https://catgirlsare.sexy/api/upload",
-            data={"key": api_key},
-            files={"file": file})
-        r.raise_for_status()
-        print(r.json()["url"])
-        file.seek(0)
-
-
-def asgard_upload(files: list[BinaryIO], location: str):
-    if (not os.environ["SSH_ASKPASS"]
-            and bool(subprocess.run([
-                "ssh-add", "-qL"],
-                stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-                    .returncode)):
-        print("SSH_ASKPASS is not set, upload may fail.", file=sys.stderr)
-
-    for file in files:
-        for i in range(3):
-            if not bool(subprocess.run([
-                    "scp",
-                    "-qo",
-                    "ServerAliveInterval 3",
-                    file.name,
-                    f"asgard.joshwprice.com:/opt/media/{location}/"])
-                        .returncode):
-                break
-        else:
-            print("Upload to asgard failed 3 times.")
-            sys.exit(1)
-        file.seek(0)
-
-
-def at_least_one_dest(args: type[argparse.Namespace]) -> bool:
-    for destination in destinations:
-        if getattr(args, destination):
-            return True
-    return False
-
-
 def main():
     # Start parsing options
     parser = argparse.ArgumentParser(
