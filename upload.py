@@ -127,15 +127,18 @@ def main():
         """care should be taken when using arguments with optional values as
         if it is given a valid file on your filesystem, it will ignore it""")
     destinations_group.add_argument(
-        "--0x0", action="store_true", help="upload to 0x0.st")
+        "--0x0", action="store_const", const=TheNullPointer(),
+        help="upload to 0x0.st")
     destinations_group.add_argument(
-        "--x0", action="store_true", help="upload to x0.at")
+        "--x0", action="store_const", const=X0(),
+        help="upload to x0.at")
     destinations_group.add_argument(
         "--asgard", nargs='?',
-        const=".misc",  help="upload to asgard")
+        const=".misc", type=Asgard,
+        help="upload to asgard")
     destinations_group.add_argument(
         "--catgirls", nargs='?',
-        const="",
+        const="", type=Catgirls,
         help="upload to catgirlsare.sexy")
     # destinations_group.add_argument(
     #     "-c", "--clipboard", action="store_true",
