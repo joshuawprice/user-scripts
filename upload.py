@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
+from abc import ABC, abstractmethod
 import argparse
 import os
 from typing import BinaryIO
 import requests
 import sys
 import subprocess
+import urllib.request
 
 
 # Code from before using intermixed parsing.
@@ -45,62 +47,68 @@ import subprocess
 ################################################################
 
 
-def the_null_pointer_upload(files: list[BinaryIO]) -> None:
-    for file in files:
+class Uploader(ABC):
+    @abstractmethod
+    def upload(self, file: BinaryIO) -> None:
+        raise NotImplementedError
+
+
+class TheNullPointer(Uploader):
+    def upload(self, file: BinaryIO) -> None:
         r = requests.post("https://0x0.st", files={"file": file})
         r.raise_for_status()
         print(r.text.strip())
-        file.seek(0)
 
 
-def x0_upload(files: list[BinaryIO]) -> None:
-    for file in files:
+class X0(Uploader):
+    def upload(self, file: BinaryIO) -> None:
         r = requests.post("https://x0.at", files={"file": file})
         r.raise_for_status()
         print(r.text.strip())
-        file.seek(0)
 
 
-def catgirls_upload(files: list[BinaryIO], api_key: str) -> None:
-    for file in files:
+class Catgirls(Uploader):
+    def __init__(self, api_key: str) -> None:
+        self.api_key = api_key
+
+    def upload(self, file: BinaryIO) -> None:
         r = requests.post(
             "https://catgirlsare.sexy/api/upload",
-            data={"key": api_key},
+            data={"key": self.api_key},
             files={"file": file})
         r.raise_for_status()
         print(r.json()["url"])
-        file.seek(0)
 
 
-def asgard_upload(files: list[BinaryIO], location: str):
-    if (not os.environ["SSH_ASKPASS"]
+class Asgard(Uploader):
+    def __init__(self, location: str) -> None:
+        self.location = location
+
+        # TODO: Look up ssh agents to check if SSH_ASKPASS is really required.
+        if (not os.getenv("SSH_ASKPASS")
             and bool(subprocess.run([
                 "ssh-add", "-qL"],
                 stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-                    .returncode)):
-        print("SSH_ASKPASS is not set, upload may fail.", file=sys.stderr)
+                .returncode)):
+            print("SSH_ASKPASS is not set, upload to asgard may fail.",
+                  file=sys.stderr)
 
-    for file in files:
+    def upload(self, file: BinaryIO) -> None:
         for i in range(3):
-            if not bool(subprocess.run([
-                    "scp",
-                    "-qo",
-                    "ServerAliveInterval 3",
-                    file.name,
-                    f"asgard.joshwprice.com:/opt/media/{location}/"])
-                        .returncode):
+            if not bool(
+                    subprocess.run([
+                        "scp",
+                        "-qo",
+                        "ServerAliveInterval 3",
+                        file.name,
+                        f"asgard.joshwprice.com:/opt/media/{self.location}/"])
+                    .returncode):
                 break
         else:
             print("Upload to asgard failed 3 times.")
             sys.exit(1)
-        file.seek(0)
-
-
-def at_least_one_dest(args: type[argparse.Namespace]) -> bool:
-    for destination in destinations:
-        if getattr(args, destination):
-            return True
-    return False
+        print("https://files.kruitana.com/"
+              + urllib.request.pathname2url(file.name))
 
 
 def main():
@@ -147,29 +155,33 @@ def main():
     print(args.files, file=sys.stderr)
     print(args, file=sys.stderr)
 
-    # Quit if no destinations are given
-    # TODO: If catgirls is empty then give better error message.
-    if not at_least_one_dest(args):
-        parser.error("at least one destination is required")
+    # TODO: Add clipboard uploader
+    destinations = []
 
     if getattr(args, "0x0"):
-        the_null_pointer_upload(args.files)
+        destinations.append(TheNullPointer())
 
     if args.x0:
-        x0_upload(args.files)
+        destinations.append(X0())
 
     if args.catgirls:
-        catgirls_upload(args.files, args.catgirls)
+        destinations.append(Catgirls(args.catgirls))
 
     if args.asgard:
-        asgard_upload(args.files, args.asgard)
+        destinations.append(Asgard(args.asgard))
 
-    # Reminder: Make uploader classes!
+    # Quit if no destinations are given
+    # TODO: If catgirls is empty then give better error message.
+    if not destinations:
+        parser.error("at least one destination is required")
+
+    for destination in destinations:
+        for file in args.files:
+            destination.upload(file)
+            file.seek(0)
 
 
 if __name__ == "__main__":
-    # TODO: Add clipboard uploader
-    destinations = ["0x0", "x0", "asgard", "catgirls"]
     main()
 
 # vim: shiftwidth=4 expandtab autoindent
