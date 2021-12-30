@@ -159,19 +159,8 @@ def main():
     print(args, file=sys.stderr)
 
     # TODO: Add clipboard uploader
-    destinations = []
-
-    if getattr(args, "0x0"):
-        destinations.append(TheNullPointer())
-
-    if args.x0:
-        destinations.append(X0())
-
-    if args.catgirls:
-        destinations.append(Catgirls(args.catgirls))
-
-    if args.asgard:
-        destinations.append(Asgard(args.asgard))
+    destinations = [getattr(args, x) for x in vars(args)
+                    if isinstance(getattr(args, x), Uploader)]
 
     # Quit if no destinations are given
     # TODO: If catgirls is empty then give better error message.
