@@ -69,6 +69,8 @@ class X0(Uploader):
 
 class Catgirls(Uploader):
     def __init__(self, api_key: str) -> None:
+        if not api_key:
+            raise ValueError
         self.api_key = api_key
 
     def upload(self, file: BinaryIO) -> None:
@@ -163,7 +165,6 @@ def main():
                     if isinstance(getattr(args, x), Uploader)]
 
     # Quit if no destinations are given
-    # TODO: If catgirls is empty then give better error message.
     if not destinations:
         parser.error("at least one destination is required")
 
