@@ -78,7 +78,10 @@ class Catgirls(Uploader):
             "https://catgirlsare.sexy/api/upload",
             data={"key": self.api_key},
             files={"file": file})
-        r.raise_for_status()
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError:
+            raise requests.exceptions.HTTPError(r.json()["error"]) from None
         print(r.json()["url"])
 
 
