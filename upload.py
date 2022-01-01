@@ -55,14 +55,14 @@ class Uploader(ABC):
 
 class TheNullPointer(Uploader):
     def upload(self, file: BinaryIO) -> None:
-        r = requests.post("https://0x0.st", files={"file": file})
+        r = requests.post("https://0x0.st", files={"file": file}, timeout=5)
         r.raise_for_status()
         print(r.text.strip())
 
 
 class X0(Uploader):
     def upload(self, file: BinaryIO) -> None:
-        r = requests.post("https://x0.at", files={"file": file})
+        r = requests.post("https://x0.at", files={"file": file}, timeout=5)
         r.raise_for_status()
         print(r.text.strip())
 
@@ -77,7 +77,8 @@ class Catgirls(Uploader):
         r = requests.post(
             "https://catgirlsare.sexy/api/upload",
             data={"key": self.api_key},
-            files={"file": file})
+            files={"file": file},
+            timeout=5)
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError:
