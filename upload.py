@@ -180,19 +180,19 @@ def main():
         """care should be taken when using arguments with optional values as
         if it is given a valid file on your filesystem, it will ignore it""")
     destinations_group.add_argument(
-        "--0x0", action="store_const", const=TheNullPointer(),
-        help="upload to 0x0.st")
+        "--0x0", action=SingleAppendConstAction, const=TheNullPointer(),
+        dest="destinations", help="upload to 0x0.st")
     destinations_group.add_argument(
-        "--x0", action="store_const", const=X0(),
-        help="upload to x0.at")
+        "--x0", action=SingleAppendConstAction, const=X0(),
+        dest="destinations", help="upload to x0.at")
     destinations_group.add_argument(
-        "--asgard", nargs='?',
+        "--asgard", action=SingleAppendAction, nargs='?',
         const=".misc", type=Asgard,
-        help="upload to asgard")
+        dest="destinations", help="upload to asgard")
     destinations_group.add_argument(
-        "--catgirls", nargs='?',
+        "--catgirls", action=SingleAppendAction, nargs='?',
         const="", type=Catgirls,
-        help="upload to catgirlsare.sexy")
+        dest="destinations", help="upload to catgirlsare.sexy")
     # destinations_group.add_argument(
     #     "-c", "--clipboard", action="store_true",
     #     help="only allowed if this is the only destination;"
@@ -212,14 +212,12 @@ def main():
     print(args, file=sys.stderr)
 
     # TODO: Add clipboard uploader
-    destinations = [getattr(args, x) for x in vars(args)
-                    if isinstance(getattr(args, x), Uploader)]
 
     # Quit if no destinations are given
-    if not destinations:
+    if not args.destinations:
         parser.error("at least one destination is required")
 
-    for destination in destinations:
+    for destination in args.destinations:
         for file in args.files:
             destination.upload(file)
             file.seek(0)
