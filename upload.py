@@ -73,6 +73,27 @@ class SingleAppendAction(argparse.Action):
         setattr(namespace, self.dest, destinations)
 
 
+class SingleAppendConstAction(SingleAppendAction):
+    """
+    A custom action similar to the default append const action. However,
+    only appends one instance of a data type to dest.
+
+    Intended to be used for ensuring uploaders are only added to dest
+    once.
+    """
+
+    def __init__(self, option_strings, dest, const,
+                 default=None, required=False, help=None, metavar=None):
+        super().__init__(option_strings=option_strings, dest=dest,
+                         nargs=0, const=const,
+                         default=default, required=required,
+                         help=help)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        super().__call__(parser, namespace,
+                         self.const, option_string)
+
+
 class Uploader(ABC):
     @abstractmethod
     def upload(self, file: BinaryIO) -> None:
