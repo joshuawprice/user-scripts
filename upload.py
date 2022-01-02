@@ -47,6 +47,32 @@ import urllib.request
 ################################################################
 
 
+class SingleAppendAction(argparse.Action):
+    """
+    A custom action similar to the default append action. However, only
+    appends one instance of a data type to dest.
+
+    Intended to be used for ensuring uploaders are only added to dest
+    once.
+    """
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        # If destinations is empty, add values and return
+        if not getattr(namespace, self.dest):
+            setattr(namespace, self.dest, [values])
+            return
+
+        # Exit if Uploader is already in destinations
+        if any((isinstance(x, type(values))
+                for x in getattr(namespace, self.dest))):
+            return
+
+        # Append values to destination then resave destinations
+        destinations = getattr(namespace, self.dest)
+        destinations.append(values)
+        setattr(namespace, self.dest, destinations)
+
+
 class Uploader(ABC):
     @abstractmethod
     def upload(self, file: BinaryIO) -> None:
