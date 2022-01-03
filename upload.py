@@ -213,9 +213,8 @@ def main():
     #          "saves file to clipboard")
 
     # Finally, allow files to be uploaded, including - (stdin)
-    # TODO: Maybe remove dupes? see files action class for how.
     parser.add_argument(
-        "files", type=argparse.FileType('rb'),
+        "files", type=argparse.FileType('rb'), action=FilesAction,
         metavar="FILE", nargs="+", help="file to be uploaded")
 
     # Save parsed arguments to args object
