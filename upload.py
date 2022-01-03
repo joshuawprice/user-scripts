@@ -10,42 +10,6 @@ import subprocess
 import urllib.request
 
 
-# Code from before using intermixed parsing.
-################################################################
-# Dedupe input files based on absolute file path
-# class files(argparse.Action):
-#     def __call__(self, parser, namespace, values, option_string=None):
-#         # Remove duplicates
-#         for i in range(0, len(values)):
-#             for j in range(i + 1, len(values)):
-#                 if (os.path.abspath(values[i].name) ==
-#  os.path.abspath(values[j].name)):
-#                     values.pop(j)
-
-#         # Append extra files found
-#         for i in extra_files:
-#             values.append(i)
-
-#         setattr(namespace, self.dest, values)
-
-
-# class destinations_with_optional_value(argparse.Action):
-#     def __call__(self, parser, namespace, value, option_string=None):
-#         if not value.endswith("/"):
-#             if os.path.isfile(value):
-#                 if getattr(namespace, "files") != None:
-#                     print(
-#                         f"Local file given to {option_string} flag. Dazed
-#  and confused, but trying to continue", file=sys.stderr)
-#                 else:
-#                     extra_files.append(open(value, 'rb'))
-#                     value = self.const
-#         else:
-#             value = value.rstrip("/")
-
-#         setattr(namespace, self.dest, value)
-################################################################
-
 class FilesAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         # Remove duplicates based on file path
