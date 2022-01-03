@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
-from abc import ABC, abstractmethod
 import argparse
 import os
-from typing import BinaryIO
-import requests
-import sys
 import subprocess
+import sys
 import urllib.request
+from abc import ABC, abstractmethod
+from typing import BinaryIO
+
+import requests
 
 
 class FilesAction(argparse.Action):
