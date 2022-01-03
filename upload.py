@@ -171,10 +171,6 @@ def main():
         "--catgirls", action=SingleAppendAction, nargs='?',
         const="", type=Catgirls,
         dest="destinations", help="upload to catgirlsare.sexy")
-    # destinations_group.add_argument(
-    #     "-c", "--clipboard", action="store_true",
-    #     help="only allowed if this is the only destination;"
-    #          "saves file to clipboard")
 
     # Finally, allow files to be uploaded, including - (stdin)
     parser.add_argument(
@@ -187,8 +183,6 @@ def main():
     # Debugging
     print(args.files, file=sys.stderr)
     print(args, file=sys.stderr)
-
-    # TODO: Add clipboard uploader
 
     # Quit if no destinations are given
     if not args.destinations:
