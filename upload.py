@@ -180,10 +180,6 @@ def main():
     # Save parsed arguments to args object
     args = parser.parse_intermixed_args()
 
-    # Debugging
-    print(args.files, file=sys.stderr)
-    print(args, file=sys.stderr)
-
     # Quit if no destinations are given
     if not args.destinations:
         parser.error("at least one destination is required")
