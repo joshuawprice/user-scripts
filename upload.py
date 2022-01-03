@@ -46,6 +46,20 @@ import urllib.request
 #         setattr(namespace, self.dest, value)
 ################################################################
 
+class FilesAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        # Remove duplicates based on file path
+        files = []
+        for value in values:
+            for file in files:
+                if value.name == file.name:
+                    value.close()
+                    break
+            else:
+                files.append(value)
+
+        setattr(namespace, self.dest, files)
+
 
 class SingleAppendAction(argparse.Action):
     """
