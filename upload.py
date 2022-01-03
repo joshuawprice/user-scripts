@@ -92,25 +92,6 @@ class X0(Uploader):
         print(r.text.strip())
 
 
-class Catgirls(Uploader):
-    def __init__(self, api_key: str) -> None:
-        if not api_key:
-            raise ValueError
-        self.api_key = api_key
-
-    def upload(self, file: BinaryIO) -> None:
-        r = requests.post(
-            "https://catgirlsare.sexy/api/upload",
-            data={"key": self.api_key},
-            files={"file": file},
-            timeout=5)
-        try:
-            r.raise_for_status()
-        except requests.exceptions.HTTPError:
-            raise requests.exceptions.HTTPError(r.json()["error"]) from None
-        print(r.json()["url"])
-
-
 class Asgard(Uploader):
     def __init__(self, location: str) -> None:
         self.location = location
@@ -140,6 +121,25 @@ class Asgard(Uploader):
             sys.exit(1)
         print("https://files.kruitana.com/"
               + urllib.request.pathname2url(file.name))
+
+
+class Catgirls(Uploader):
+    def __init__(self, api_key: str) -> None:
+        if not api_key:
+            raise ValueError
+        self.api_key = api_key
+
+    def upload(self, file: BinaryIO) -> None:
+        r = requests.post(
+            "https://catgirlsare.sexy/api/upload",
+            data={"key": self.api_key},
+            files={"file": file},
+            timeout=5)
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError:
+            raise requests.exceptions.HTTPError(r.json()["error"]) from None
+        print(r.json()["url"])
 
 
 def main():
