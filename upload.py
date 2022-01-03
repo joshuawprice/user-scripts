@@ -10,41 +10,66 @@ import subprocess
 import urllib.request
 
 
-# Code from before using intermixed parsing.
-################################################################
-# Dedupe input files based on absolute file path
-# class files(argparse.Action):
-#     def __call__(self, parser, namespace, values, option_string=None):
-#         # Remove duplicates
-#         for i in range(0, len(values)):
-#             for j in range(i + 1, len(values)):
-#                 if (os.path.abspath(values[i].name) ==
-#  os.path.abspath(values[j].name)):
-#                     values.pop(j)
+class FilesAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        # Remove duplicates based on file path
+        files = []
+        for value in values:
+            for file in files:
+                if value.name == file.name:
+                    value.close()
+                    break
+            else:
+                files.append(value)
 
-#         # Append extra files found
-#         for i in extra_files:
-#             values.append(i)
-
-#         setattr(namespace, self.dest, values)
+        setattr(namespace, self.dest, files)
 
 
-# class destinations_with_optional_value(argparse.Action):
-#     def __call__(self, parser, namespace, value, option_string=None):
-#         if not value.endswith("/"):
-#             if os.path.isfile(value):
-#                 if getattr(namespace, "files") != None:
-#                     print(
-#                         f"Local file given to {option_string} flag. Dazed
-#  and confused, but trying to continue", file=sys.stderr)
-#                 else:
-#                     extra_files.append(open(value, 'rb'))
-#                     value = self.const
-#         else:
-#             value = value.rstrip("/")
+class SingleAppendAction(argparse.Action):
+    """
+    A custom action similar to the default append action. However, only
+    appends one instance of a data type to dest.
 
-#         setattr(namespace, self.dest, value)
-################################################################
+    Intended to be used for ensuring uploaders are only added to dest
+    once.
+    """
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        # If destinations is empty, add values and return
+        if not getattr(namespace, self.dest):
+            setattr(namespace, self.dest, [values])
+            return
+
+        # Exit if Uploader is already in destinations
+        if any((isinstance(x, type(values))
+                for x in getattr(namespace, self.dest))):
+            return
+
+        # Append values to destination then resave destinations
+        destinations = getattr(namespace, self.dest)
+        destinations.append(values)
+        setattr(namespace, self.dest, destinations)
+
+
+class SingleAppendConstAction(SingleAppendAction):
+    """
+    A custom action similar to the default append const action. However,
+    only appends one instance of a data type to dest.
+
+    Intended to be used for ensuring uploaders are only added to dest
+    once.
+    """
+
+    def __init__(self, option_strings, dest, const,
+                 default=None, required=False, help=None, metavar=None):
+        super().__init__(option_strings=option_strings, dest=dest,
+                         nargs=0, const=const,
+                         default=default, required=required,
+                         help=help)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        super().__call__(parser, namespace,
+                         self.const, option_string)
 
 
 class Uploader(ABC):
@@ -133,28 +158,27 @@ def main():
         """care should be taken when using arguments with optional values as
         if it is given a valid file on your filesystem, it will ignore it""")
     destinations_group.add_argument(
-        "--0x0", action="store_const", const=TheNullPointer(),
-        help="upload to 0x0.st")
+        "--0x0", action=SingleAppendConstAction, const=TheNullPointer(),
+        dest="destinations", help="upload to 0x0.st")
     destinations_group.add_argument(
-        "--x0", action="store_const", const=X0(),
-        help="upload to x0.at")
+        "--x0", action=SingleAppendConstAction, const=X0(),
+        dest="destinations", help="upload to x0.at")
     destinations_group.add_argument(
-        "--asgard", nargs='?',
+        "--asgard", action=SingleAppendAction, nargs='?',
         const=".misc", type=Asgard,
-        help="upload to asgard")
+        dest="destinations", help="upload to asgard")
     destinations_group.add_argument(
-        "--catgirls", nargs='?',
+        "--catgirls", action=SingleAppendAction, nargs='?',
         const="", type=Catgirls,
-        help="upload to catgirlsare.sexy")
+        dest="destinations", help="upload to catgirlsare.sexy")
     # destinations_group.add_argument(
     #     "-c", "--clipboard", action="store_true",
     #     help="only allowed if this is the only destination;"
     #          "saves file to clipboard")
 
     # Finally, allow files to be uploaded, including - (stdin)
-    # TODO: Maybe remove dupes? see files action class for how.
     parser.add_argument(
-        "files", type=argparse.FileType('rb'),
+        "files", type=argparse.FileType('rb'), action=FilesAction,
         metavar="FILE", nargs="+", help="file to be uploaded")
 
     # Save parsed arguments to args object
@@ -165,14 +189,12 @@ def main():
     print(args, file=sys.stderr)
 
     # TODO: Add clipboard uploader
-    destinations = [getattr(args, x) for x in vars(args)
-                    if isinstance(getattr(args, x), Uploader)]
 
     # Quit if no destinations are given
-    if not destinations:
+    if not args.destinations:
         parser.error("at least one destination is required")
 
-    for destination in destinations:
+    for destination in args.destinations:
         for file in args.files:
             destination.upload(file)
             file.seek(0)
