@@ -166,11 +166,11 @@ def main():
         dest="destinations", help="upload to x0.at")
     destinations.add_argument(
         "--asgard", action=SingleAppendAction, nargs='?',
-        const=".misc", type=Asgard,
+        const=".misc", type=Asgard, metavar="LOCATION",
         dest="destinations", help="upload to asgard")
     destinations.add_argument(
         "--catgirls", action=SingleAppendAction, nargs='?',
-        const="", type=Catgirls,
+        const="", type=Catgirls, metavar="API_KEY",
         dest="destinations", help="upload to catgirlsare.sexy")
 
     # Finally, allow files to be uploaded, including - (stdin)
