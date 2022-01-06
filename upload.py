@@ -75,22 +75,22 @@ class SingleAppendConstAction(SingleAppendAction):
 
 class Uploader(ABC):
     @abstractmethod
-    def upload(self, file: BinaryIO) -> None:
+    def upload(self, file: BinaryIO) -> str:
         raise NotImplementedError
 
 
 class TheNullPointer(Uploader):
-    def upload(self, file: BinaryIO) -> None:
+    def upload(self, file: BinaryIO) -> str:
         r = requests.post("https://0x0.st", files={"file": file}, timeout=5)
         r.raise_for_status()
-        print(r.text.strip())
+        return r.text.strip()
 
 
 class X0(Uploader):
-    def upload(self, file: BinaryIO) -> None:
+    def upload(self, file: BinaryIO) -> str:
         r = requests.post("https://x0.at", files={"file": file}, timeout=5)
         r.raise_for_status()
-        print(r.text.strip())
+        return r.text.strip()
 
 
 class Asgard(Uploader):
@@ -106,7 +106,7 @@ class Asgard(Uploader):
             print("SSH_ASKPASS is not set, upload to asgard may fail.",
                   file=sys.stderr)
 
-    def upload(self, file: BinaryIO) -> None:
+    def upload(self, file: BinaryIO) -> str:
         for i in range(3):
             if not bool(
                     subprocess.run([
@@ -120,8 +120,8 @@ class Asgard(Uploader):
         else:
             print("Upload to asgard failed 3 times.")
             sys.exit(1)
-        print("https://files.kruitana.com/"
-              + urllib.request.pathname2url(file.name))
+        return ("https://files.kruitana.com/"
+                + urllib.request.pathname2url(file.name))
 
 
 class Catgirls(Uploader):
@@ -130,7 +130,7 @@ class Catgirls(Uploader):
             raise ValueError
         self.api_key = api_key
 
-    def upload(self, file: BinaryIO) -> None:
+    def upload(self, file: BinaryIO) -> str:
         r = requests.post(
             "https://catgirlsare.sexy/api/upload",
             data={"key": self.api_key},
@@ -140,7 +140,7 @@ class Catgirls(Uploader):
             r.raise_for_status()
         except requests.exceptions.HTTPError:
             raise requests.exceptions.HTTPError(r.json()["error"]) from None
-        print(r.json()["url"])
+        return r.json()["url"]
 
 
 def main():
@@ -187,7 +187,7 @@ def main():
 
     for destination in args.destinations:
         for file in args.files:
-            destination.upload(file)
+            print(destination.upload(file))
             file.seek(0)
 
 
