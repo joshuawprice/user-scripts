@@ -185,9 +185,11 @@ def main():
     if not args.destinations:
         parser.error("at least one destination is required")
 
+    urls = []
     for destination in args.destinations:
         for file in args.files:
-            print(destination.upload(file))
+            urls.append(destination.upload(file))
+            print(urls[len(urls) - 1])
             file.seek(0)
 
 
