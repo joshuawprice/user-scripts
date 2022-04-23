@@ -154,21 +154,21 @@ def main():
                         help="copy the response url to clipboard")
 
     # Add destinations for the script
-    destinations_group = parser.add_argument_group(
+    destinations = parser.add_argument_group(
         "destinations",
         """care should be taken when using arguments with optional values as
         if it is given a valid file on your filesystem, it will ignore it""")
-    destinations_group.add_argument(
+    destinations.add_argument(
         "--0x0", action=SingleAppendConstAction, const=TheNullPointer(),
         dest="destinations", help="upload to 0x0.st")
-    destinations_group.add_argument(
+    destinations.add_argument(
         "--x0", action=SingleAppendConstAction, const=X0(),
         dest="destinations", help="upload to x0.at")
-    destinations_group.add_argument(
+    destinations.add_argument(
         "--asgard", action=SingleAppendAction, nargs='?',
         const=".misc", type=Asgard,
         dest="destinations", help="upload to asgard")
-    destinations_group.add_argument(
+    destinations.add_argument(
         "--catgirls", action=SingleAppendAction, nargs='?',
         const="", type=Catgirls,
         dest="destinations", help="upload to catgirlsare.sexy")
